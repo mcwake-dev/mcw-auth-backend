@@ -1,0 +1,36 @@
+{
+  "name": "mcw-auth-redis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "seed-dev": "node -r ./env/developmentjs db/seed/run-seed.js",
+    "dev": "nodemon -- -r ./env/development.js index.js",
+    "test-dev": "jest __tests__/*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async-redis": "^2.0.0",
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.2",
+    "connect-redis": "^6.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-session": "^1.17.2",
+    "joi": "^17.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "loglevel": "^1.8.0",
+    "loglevel-plugin-prefix": "^0.8.4",
+    "node-rsa": "^1.1.1",
+    "nodemon": "^2.0.15",
+    "redis": "^4.0.3",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "supertest": "^6.2.2"
+  }
+}
