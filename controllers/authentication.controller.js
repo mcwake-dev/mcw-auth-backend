@@ -4,14 +4,11 @@ const authSchema = require("../schemas/authentication");
 const { register, get } = require("../models/user.model");
 const { validatePassword } = require("../utils/password");
 const jwt = require("jsonwebtoken");
-const { isValidAudience } = require("../models/audience.model");
 
 exports.register = async (req, res, next) => {
   const logger = log.getLogger("Authentication Controller > register");
 
   logger.info("Attempting to register new user");
-
-  console.log(req.body);
 
   try {
     const { username, given_name, surname, password } = req.body;
@@ -43,7 +40,6 @@ exports.authenticate = async (req, res, next) => {
     const user = get(authValues.username);
 
     if (user) {
-      console.log(authValues);
       const passwordCorrect = await validatePassword(
         authValues.password,
         user.password
@@ -52,9 +48,19 @@ exports.authenticate = async (req, res, next) => {
       if (passwordCorrect) {
         delete user.password;
 
-        req.session.user = { ...user };
+        const token = jwt.sign(
+          { user: req.session.user },
+          process.env.JWT_PRIVATE_KEY,
+          {
+            issuer: process.env.JWT_ISSUER,
+            audience: process.env.JWT_AUDIENCE,
+            subject: username,
+            expiresIn: JWT_EXPIRES,
+            algorithm: process.env.algorithm,
+          }
+        );
 
-        res.redirect("/authenticateForSite");
+        res.status(200).send({token});
       } else {
         next({ msg: "Password incorrect", status: 403 });
       }
@@ -66,45 +72,6 @@ exports.authenticate = async (req, res, next) => {
 
     logger.warn(errorMessage);
     next({ msg: errorMessage, status: 400 });
-  }
-};
-
-exports.authenticateForSite = async (req, res, next) => {
-  const logger = log.getLogger(
-    "Authentication Controller > authenticateForSite"
-  );
-
-  if (!req.session.user) {
-    logger.info("User is not authenticated");
-    next({ msg: "Not authenticated", status: 403 });
-  } else {
-    logger.info("User is authenticated, checking audience");
-    const { username } = req.session.user;
-    const { audience } = req.body;
-
-    if (isValidAudience(audience)) {
-      logger.info("Audience is valid, creating token");
-
-      const token = jwt.sign(
-        { user: req.session.user },
-        process.env.JWT_PRIVATE_KEY,
-        {
-          issuer: process.env.JWT_ISSUER,
-          audience,
-          subject: username,
-          expiresIn: JWT_EXPIRES,
-          algorithm: process.env.algorithm,
-        }
-      );
-
-      logger.info("Issuing token");
-
-      res.status(200).send({ token });
-    } else {
-      logger.warn("Audience invalid");
-
-      next({ msg: "Invalid Audience", status: 403 });
-    }
   }
 };
 

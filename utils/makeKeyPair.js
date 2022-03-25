@@ -1,9 +1,6 @@
 const NodeRSA = require("node-rsa");
 const key = new NodeRSA({ b: 512 });
 
-let keypair = {
-  private: `\n${key.exportKey()}\n`,
-  public: `\n${key.exportKey("public")}\n`,
-};
+console.log(key.exportKey());
 
-console.log(keypair);
+console.log(key.exportKey("public"));

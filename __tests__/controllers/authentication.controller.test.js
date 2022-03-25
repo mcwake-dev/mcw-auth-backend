@@ -3,7 +3,6 @@ const { expect, it, describe, beforeAll, afterAll } = require("@jest/globals");
 const request = require("supertest");
 const db = require("../../db/db");
 const app = require("../../app");
-const jwt = require("jsonwebtoken");
 
 beforeAll(async () => {
   await db.DEL("testuser");
